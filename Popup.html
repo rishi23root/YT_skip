@@ -1,14 +1,22 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>YouTube Transcript Skipper</title>
-    <link rel="stylesheet" href="styles.css" />
-    <script src="popup.js"></script>
-  </head>
-  <body>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>YouTube Transcript Skipper</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="Popup.js"></script>
+</head>
+
+<body>
+  <div class="container">
     <h2>YouTube Skipper</h2>
-    <button id="processBtn">Process This Video</button>
-    <div id="result"></div>
-  </body>
+    <label class="switch">
+      <input type="checkbox" id="skipperToggle">
+      <span class="slider round"></span>
+    </label>
+    <p id="status">Skipper is disabled</p>
+  </div>
+</body>
+
 </html>

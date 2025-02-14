@@ -1,9 +1,21 @@
 {
   "manifest_version": 3,
-  "name": "YouTube Skipper",
+  "name": "YouTube Transcript Skipper",
   "version": "1.0",
-  "description": "skips the not important part from the video and shows the important and relavent value additional part only",
-  "permissions": ["activeTab", "scripting"],
+  "description": "Automatically skips uninteresting parts of YouTube videos based on transcript analysis",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting",
+    "notifications"
+  ],
+  "host_permissions": [
+    "http://127.0.0.1:8000/*",
+    "https://www.youtube.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
   "action": {
     "default_popup": "Popup.html",
     "default_icon": {
@@ -14,8 +26,12 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://*.youtube.com/watch*"],
-      "js": ["Popup.js"]
+      "matches": [
+        "https://www.youtube.com/*"
+      ],
+      "js": [
+        "content.js"
+      ]
     }
   ]
 }
