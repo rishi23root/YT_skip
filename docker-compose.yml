@@ -1,0 +1,22 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: app
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - GOOGLE_API_KEY=AIzaSyCGT-nvQ-TznONGh82ppCim-2-YqsS0mv4
+      - DEV_MODE=true # Set to "true" to enable auto-reload in development
+    volumes:
+      - .:/app # Mount the project directory for live updates
+    # command:
+    #   ["uvicorn", ":app", "--host", "0.0.0.0", "--port", "8000"]
+    command: >
+      sh -c "if [ '$$DEV_MODE' = 'true' ]; then
+               uvicorn backend.app:app --host 0.0.0.0 --port 8000 --reload;
+             else
+               uvicorn backend.app:app --host 0.0.0.0 --port 8000;
+             fi"
