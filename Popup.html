@@ -10,12 +10,96 @@
 
 <body>
   <div class="container">
-    <h2>YouTube Skipper</h2>
-    <label class="switch">
-      <input type="checkbox" id="skipperToggle">
-      <span class="slider round"></span>
-    </label>
-    <p id="status">Skipper is disabled</p>
+    <div class="header">
+      <h2>YouTube Skipper</h2>
+      <div class="main-toggle">
+        <label class="switch">
+          <input type="checkbox" id="skipperToggle">
+          <span class="slider round"></span>
+        </label>
+        <p id="status">Skipper is disabled</p>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-button active" data-tab="main">Main</button>
+      <button class="tab-button" data-tab="preferences">Preferences</button>
+    </div>
+
+    <div id="main-tab" class="tab-content active">
+      <div class="info-section">
+        <p class="description">Automatically skip unwanted content based on your preferences.</p>
+        <div class="quick-stats" id="quickStats" style="display: none;">
+          <div class="stat">
+            <span class="stat-label">Active Categories:</span>
+            <span class="stat-value" id="activeCategoriesCount">0</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Custom Terms:</span>
+            <span class="stat-value" id="customTermsCount">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="preferences-tab" class="tab-content">
+      <div class="preferences-section">
+        <h3>Skip Categories</h3>
+        <div class="categories-grid" id="categoriesGrid">
+          <!-- Categories will be loaded dynamically -->
+        </div>
+
+        <h3>Custom Keywords</h3>
+        <div class="custom-input-section">
+          <input type="text" id="customKeywordInput" placeholder="Add keyword to skip (e.g., 'politics')">
+          <button id="addKeywordBtn" class="add-btn">Add</button>
+        </div>
+        <div class="custom-tags" id="customKeywords">
+          <!-- Custom keywords will appear here -->
+        </div>
+
+        <h3>Custom Phrases</h3>
+        <div class="custom-input-section">
+          <input type="text" id="customPhraseInput" placeholder="Add phrase to skip (e.g., 'my personal opinion')">
+          <button id="addPhraseBtn" class="add-btn">Add</button>
+        </div>
+        <div class="custom-tags" id="customPhrases">
+          <!-- Custom phrases will appear here -->
+        </div>
+
+        <h3>Sensitivity</h3>
+        <div class="sensitivity-section">
+          <label class="radio-option">
+            <input type="radio" name="sensitivity" value="low">
+            <span class="radio-label">
+              <strong>Low</strong> - Only skip obvious interruptions (5-10% reduction)
+            </span>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="sensitivity" value="medium" checked>
+            <span class="radio-label">
+              <strong>Medium</strong> - Balanced skipping (10-20% reduction)
+            </span>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="sensitivity" value="high">
+            <span class="radio-label">
+              <strong>High</strong> - Aggressive skipping (20-30% reduction)
+            </span>
+          </label>
+        </div>
+
+        <div class="preferences-actions">
+          <button id="resetPreferencesBtn" class="reset-btn">Reset to Defaults</button>
+          <button id="savePreferencesBtn" class="save-btn">Save Preferences</button>
+          <div class="auto-save-info">
+            <small style="color: #666; font-size: 11px;">
+              ℹ️ Changes are saved automatically
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </body>
 

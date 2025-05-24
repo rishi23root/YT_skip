@@ -1,53 +1,328 @@
-h1 {
-    text-align: center;
-}
-
+/* Chrome Extension Popup Styles */
 body {
-    width: 250px;
-    padding: 20px;
-    font-family: Arial, sans-serif;
-}
-
-button {
-    background-color: red;
+    width: 420px;
+    min-height: 300px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    border-radius: 8px;
-    width: max-content;
-    height: max-content;
-    padding: 10px;
-    font-size: large;
-    margin: auto;
-    display: block;
-    border-color: coral;
-}
-
-button[disabled] {
-    background-color: lightcoral;
-    color: white;
-    border-radius: 8px;
-    width: max-content;
-    height: max-content;
-    padding: 10px;
-    font-size: large;
-    margin: auto;
-    display: block;
-    border-color: lightpink;
-}
-
-p {
-    font-size: medium;
 }
 
 .container {
+    padding: 0;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    margin: 8px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.header {
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.header h2 {
+    margin: 0 0 15px 0;
+    font-size: 24px;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.main-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+/* Tab Navigation */
+.tabs {
+    display: flex;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 0;
+}
+
+.tab-button {
+    flex: 1;
+    padding: 12px 20px;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-bottom: 2px solid transparent;
+}
+
+.tab-button.active {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+    border-bottom-color: #4CAF50;
+}
+
+.tab-button:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+}
+
+/* Tab Content */
+.tab-content {
+    display: none;
+    padding: 20px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Main Tab */
+.info-section {
     text-align: center;
 }
 
-h2 {
-    color: #333;
+.description {
+    margin: 0 0 20px 0;
+    font-size: 14px;
+    line-height: 1.5;
+    opacity: 0.9;
+}
+
+.quick-stats {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.stat {
+    text-align: center;
+}
+
+.stat-label {
+    display: block;
+    font-size: 12px;
+    opacity: 0.8;
+    margin-bottom: 4px;
+}
+
+.stat-value {
+    display: block;
+    font-size: 18px;
+    font-weight: bold;
+    color: #4CAF50;
+}
+
+/* Preferences Tab */
+.preferences-section h3 {
+    margin: 20px 0 15px 0;
+    font-size: 16px;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 8px;
+}
+
+.preferences-section h3:first-child {
+    margin-top: 0;
+}
+
+/* Categories Grid */
+.categories-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
     margin-bottom: 20px;
 }
 
-/* Toggle Switch */
+.category-option {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 12px;
+    text-align: center;
+}
+
+.category-option:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
+}
+
+.category-option.selected {
+    background: rgba(76, 175, 80, 0.3);
+    border-color: #4CAF50;
+}
+
+.category-option .category-name {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.category-option .category-desc {
+    font-size: 10px;
+    opacity: 0.8;
+}
+
+/* Custom Input Section */
+.custom-input-section {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.custom-input-section input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 12px;
+}
+
+.custom-input-section input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.custom-input-section input:focus {
+    outline: none;
+    border-color: #4CAF50;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.add-btn {
+    padding: 8px 16px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: background 0.3s ease;
+}
+
+.add-btn:hover {
+    background: #45a049;
+}
+
+/* Custom Tags */
+.custom-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-height: 30px;
+    margin-bottom: 15px;
+}
+
+.custom-tag {
+    background: rgba(255, 193, 7, 0.3);
+    border: 1px solid rgba(255, 193, 7, 0.5);
+    border-radius: 15px;
+    padding: 4px 12px;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.custom-tag .remove-tag {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.2s ease;
+}
+
+.custom-tag .remove-tag:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Sensitivity Section */
+.sensitivity-section {
+    margin-bottom: 20px;
+}
+
+.radio-option {
+    display: block;
+    margin-bottom: 12px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    transition: background 0.3s ease;
+}
+
+.radio-option:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.radio-option input[type="radio"] {
+    margin-right: 10px;
+}
+
+.radio-label {
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+/* Preferences Actions */
+.preferences-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.reset-btn {
+    padding: 10px 20px;
+    background: rgba(244, 67, 54, 0.3);
+    border: 1px solid rgba(244, 67, 54, 0.5);
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.reset-btn:hover {
+    background: rgba(244, 67, 54, 0.5);
+}
+
+.save-btn {
+    padding: 10px 20px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: background 0.3s ease;
+}
+
+.save-btn:hover {
+    background: #45a049;
+}
+
+/* Toggle Switch (existing styles enhanced) */
 .switch {
     position: relative;
     display: inline-block;
@@ -68,8 +343,9 @@ h2 {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #ccc;
-    transition: .4s;
+    background-color: rgba(255, 255, 255, 0.3);
+    transition: 0.4s;
+    border-radius: 34px;
 }
 
 .slider:before {
@@ -80,27 +356,155 @@ h2 {
     left: 4px;
     bottom: 4px;
     background-color: white;
-    transition: .4s;
+    transition: 0.4s;
+    border-radius: 50%;
 }
 
 input:checked+.slider {
-    background-color: #ff0000;
+    background-color: #4CAF50;
 }
 
 input:checked+.slider:before {
     transform: translateX(26px);
 }
 
-.slider.round {
-    border-radius: 34px;
-}
-
-.slider.round:before {
-    border-radius: 50%;
-}
-
 #status {
-    margin-top: 15px;
-    color: #666;
+    margin: 0;
+    font-weight: 500;
     font-size: 14px;
+}
+
+/* Scrollbar Styling */
+.tab-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.tab-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+.tab-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+.tab-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* Notification animations */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Notification styling improvements */
+.popup-notification {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 6px !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    transition: all 0.3s ease;
+}
+
+.popup-notification:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Custom tag improvements for better visual feedback */
+.custom-tag {
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.custom-tag:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.custom-tag .remove-tag {
+    transition: all 0.2s ease;
+}
+
+.custom-tag .remove-tag:hover {
+    background-color: #ff4444;
+    transform: scale(1.1);
+}
+
+/* Category option improvements */
+.category-option {
+    transition: all 0.2s ease;
+}
+
+.category-option:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Add loading state for save button */
+.save-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    position: relative;
+}
+
+.save-btn:disabled::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 12px;
+    height: 12px;
+    margin: -6px 0 0 -6px;
+    border: 2px solid transparent;
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Auto-save information styling */
+.auto-save-info {
+    margin-top: 8px;
+    text-align: center;
+    padding: 4px 8px;
+    background: rgba(33, 150, 243, 0.1);
+    border-radius: 4px;
+    border: 1px solid rgba(33, 150, 243, 0.2);
+}
+
+.auto-save-info small {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
 }

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - YouTube Transcript Skipper Popup</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body style="min-width: 400px; min-height: 500px; padding: 20px;">
+    <h2>Testing Custom Keywords/Phrases Loading</h2>
+
+    <!-- Simulate chrome.storage for testing -->
+    <script>
+        // Mock chrome storage for testing
+        window.chrome = {
+            storage: {
+                local: {
+                    get: function (keys, callback) {
+                        // Simulate saved data
+                        const mockData = {
+                            userPreferences: {
+                                default_categories: ['advertisements', 'political_content'],
+                                custom_keywords: ['drama', 'crypto', 'NFT'],
+                                custom_phrases: ['my personal opinion', 'sponsored content'],
+                                sensitivity: 'medium',
+                                enabled: true
+                            },
+                            skipperEnabled: true
+                        };
+                        callback(mockData);
+                    },
+                    set: function (data, callback) {
+                        console.log('Mock save:', data);
+                        if (callback) callback();
+                    }
+                }
+            },
+            tabs: {
+                query: function (options, callback) {
+                    callback([{ id: 1, url: 'https://youtube.com/watch?v=test' }]);
+                },
+                sendMessage: function (tabId, message) {
+                    console.log('Mock message to tab:', message);
+                }
+            }
+        };
+    </script>
+
+    <!-- Include the actual popup HTML content -->
+    <div class="popup-container">
+        <div class="popup-header">
+            <h3>YouTube Transcript Skipper</h3>
+            <div class="toggle-container">
+                <label class="toggle">
+                    <input type="checkbox" id="skipperToggle" checked>
+                    <span class="slider"></span>
+                </label>
+                <span id="status">Skipper is active</span>
+            </div>
+        </div>
+
+        <div class="tab-navigation">
+            <button class="tab-button active" data-tab="main">Main</button>
+            <button class="tab-button" data-tab="preferences">Preferences</button>
+        </div>
+
+        <div id="main-tab" class="tab-content active">
+            <div class="quick-stats" id="quickStats">
+                <div class="stat">
+                    <span class="stat-number" id="activeCategoriesCount">0</span>
+                    <span class="stat-label">Active Categories</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number" id="customTermsCount">0</span>
+                    <span class="stat-label">Custom Terms</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="preferences-tab" class="tab-content">
+            <div class="preferences-section">
+                <h3>Skip Categories</h3>
+                <div class="categories-grid" id="categoriesGrid">
+                    <!-- Categories will be loaded dynamically -->
+                </div>
+
+                <h3>Custom Keywords</h3>
+                <div class="custom-input-section">
+                    <input type="text" id="customKeywordInput" placeholder="Add keyword to skip (e.g., 'politics')">
+                    <button id="addKeywordBtn" class="add-btn">Add</button>
+                </div>
+                <div class="custom-tags" id="customKeywords">
+                    <!-- Custom keywords will appear here -->
+                </div>
+
+                <h3>Custom Phrases</h3>
+                <div class="custom-input-section">
+                    <input type="text" id="customPhraseInput"
+                        placeholder="Add phrase to skip (e.g., 'my personal opinion')">
+                    <button id="addPhraseBtn" class="add-btn">Add</button>
+                </div>
+                <div class="custom-tags" id="customPhrases">
+                    <!-- Custom phrases will appear here -->
+                </div>
+
+                <h3>Sensitivity</h3>
+                <div class="sensitivity-section">
+                    <label class="radio-option">
+                        <input type="radio" name="sensitivity" value="low">
+                        <span class="radio-label">
+                            <strong>Low</strong> - Only skip obvious interruptions (5-10% reduction)
+                        </span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="sensitivity" value="medium" checked>
+                        <span class="radio-label">
+                            <strong>Medium</strong> - Balanced skipping (10-20% reduction)
+                        </span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="sensitivity" value="high">
+                        <span class="radio-label">
+                            <strong>High</strong> - Aggressive skipping (20-30% reduction)
+                        </span>
+                    </label>
+                </div>
+
+                <div class="action-buttons">
+                    <button id="savePreferencesBtn" class="save-btn">Save Preferences</button>
+                    <button id="resetPreferencesBtn" class="reset-btn">Reset to Defaults</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="Popup.js"></script>
+
+    <script>
+        // Test instructions
+        setTimeout(() => {
+            console.log('=== TEST RESULTS ===');
+            console.log('1. Check if custom keywords appear immediately:',
+                document.getElementById('customKeywords').children.length > 0 ? 'PASS' : 'FAIL');
+            console.log('2. Check if custom phrases appear immediately:',
+                document.getElementById('customPhrases').children.length > 0 ? 'PASS' : 'FAIL');
+            console.log('3. Check active categories count:',
+                document.getElementById('activeCategoriesCount').textContent);
+            console.log('4. Check custom terms count:',
+                document.getElementById('customTermsCount').textContent);
+
+            // Switch to preferences tab and back to test the bug
+            document.querySelector('[data-tab="preferences"]').click();
+            setTimeout(() => {
+                console.log('5. Custom tags still visible after tab switch:',
+                    document.getElementById('customKeywords').children.length > 0 &&
+                        document.getElementById('customPhrases').children.length > 0 ? 'PASS' : 'FAIL');
+            }, 100);
+        }, 500);
+    </script>
+</body>
+
+</html>

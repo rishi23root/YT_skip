@@ -10,7 +10,6 @@ from pydantic import BaseModel, ConfigDict
 from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled, NoTranscriptFound
 from groq import Groq
 import asyncio
-import re
 
 # Configure logging
 logging.basicConfig(
@@ -195,65 +194,6 @@ def optimize_transcript_for_llm(transcription_data: List[TranscriptionResult], m
     
     return "\n".join(important_segments)
 
-def extract_failed_generation_from_error(error_str: str) -> str:
-    """Extract failed_generation from Groq error string"""
-    try:
-        # Extract everything from 'failed_generation': ' to the last '}
-        pattern = r"'failed_generation':\s*'(.*?)'\s*}\s*}\s*$"
-        match = re.search(pattern, error_str, re.DOTALL)
-        
-        if match:
-            failed_generation = match.group(1)
-            # Unescape the string
-            failed_generation = failed_generation.replace('\\n', '\n').replace('\\"', '"')
-            return failed_generation
-        
-        return ""
-    except Exception as e:
-        logger.error(f"Error extracting failed generation: {e}")
-        return ""
-
-def extract_segments_fallback(response_content: str) -> List[float]:
-    """Fallback function to extract segment timestamps from malformed JSON responses"""
-    try:
-        import re
-        # Try to find all decimal numbers that could be timestamps
-        numbers = re.findall(r'\b\d+\.?\d*\b', response_content)
-        # Convert to float and filter reasonable timestamp values (0-7200 seconds = 2 hours)
-        segments = []
-        for num_str in numbers:
-            try:
-                num = float(num_str)
-                if 0 <= num <= 7200:  # Reasonable video length limit
-                    segments.append(num)
-            except ValueError:
-                continue
-        return sorted(list(set(segments)))  # Remove duplicates and sort
-    except Exception as e:
-        logger.error(f"Fallback extraction failed: {e}")
-        return []
-
-def clean_llm_response(response_content: str) -> str:
-    """Clean and sanitize LLM response to ensure valid JSON format"""
-    try:
-        # Remove common formatting issues
-        cleaned = response_content.strip()
-        
-        # Remove any trailing 's' from numbers (like "263.0s" -> "263.0")
-        cleaned = re.sub(r'(\d+\.?\d*)s\b', r'\1', cleaned)
-        
-        # Remove any other common suffixes that might appear
-        cleaned = re.sub(r'(\d+\.?\d*)(sec|seconds|ms)\b', r'\1', cleaned)
-        
-        # Ensure proper JSON formatting - remove any trailing commas
-        cleaned = re.sub(r',\s*]', ']', cleaned)
-        cleaned = re.sub(r',\s*}', '}', cleaned)
-        
-        return cleaned
-    except Exception as e:
-        logger.warning(f"Error cleaning LLM response: {e}")
-        return response_content
-
 def get_optimized_prompt_with_preferences(
     video_duration: float, 
     word_count: int, 
@@ -263,12 +203,7 @@ def get_optimized_prompt_with_preferences(
     
     base_prompt = """You are an expert video editor with advanced pattern recognition. Analyze the transcript and identify precise start times of segments that should be skipped based on user preferences.
 
-CRITICAL JSON FORMAT REQUIREMENTS:
-- Return ONLY a valid JSON object
-- Format: {"segments": [12.5, 45.2, 89.7]}
-- Numbers must be pure decimals (NO units like 's', 'sec', 'seconds')
-- No trailing commas
-- No comments or explanations outside the JSON
+CRITICAL: Return ONLY a JSON object with start times: {"segments": [12.5, 45.2, 89.7]}
 
 ALWAYS SKIP THESE SEGMENTS:
 🎯 HIGH PRIORITY:
@@ -310,12 +245,7 @@ ANALYSIS GUIDELINES:
 - Focus on segments that interrupt content flow or match user preferences
 - Prioritize skips that save time without losing meaning
 - Consider pacing - don't over-skip fast-paced content
-- Preserve context needed for understanding
-
-RESPONSE FORMAT EXAMPLE:
-{"segments": [12.5, 45.2, 89.7, 123.1, 156.8]}
-
-Remember: Return ONLY the JSON object with numeric timestamps."""
+- Preserve context needed for understanding"""
 
     # Adjust criteria based on video characteristics
     if video_duration > 1800:  # 30+ minutes
@@ -540,7 +470,6 @@ async def process_video(video_id: str, user_preferences: Optional[UserPreference
     except NoTranscriptFound:
         raise HTTPException(status_code=400, detail="No transcript found for this video.")
     except Exception as e:
-        logger.error(f"Error fetching transcript: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error fetching transcript: {str(e)}")
 
     # Calculate metadata
@@ -580,7 +509,7 @@ async def process_video(video_id: str, user_preferences: Optional[UserPreference
             messages=[
                 {
                     "role": "system", 
-                    "content": "You are a precision video editing AI. Return ONLY valid JSON format: {\"segments\": [12.5, 45.2]}. Numbers must be pure decimals without units. No explanations outside JSON."
+                    "content": "You are a precision video editing AI. Analyze patterns and return only JSON with skip timestamps. Focus on segments that truly diminish viewer experience."
                 },
                 {
                     "role": "user", 
@@ -593,13 +522,7 @@ async def process_video(video_id: str, user_preferences: Optional[UserPreference
         )
         
         response_content = response.choices[0].message.content
-        
-        # Clean the response before parsing JSON
-        cleaned_response = clean_llm_response(response_content)
-        logger.info(f"Original LLM response: {response_content}")
-        logger.info(f"Cleaned LLM response: {cleaned_response}")
-        
-        response_json = json.loads(cleaned_response)
+        response_json = json.loads(response_content)
         segments = response_json.get('segments', [])
         
         # Log the LLM response
@@ -609,48 +532,10 @@ async def process_video(video_id: str, user_preferences: Optional[UserPreference
         non_important_segments = ImportantSegments(segments=segments)
         skip_segments = create_enhanced_skip_segments(transcription_data, non_important_segments, user_preferences)
         
-    except json.JSONDecodeError as e:
-        logger.error(f"JSON decode error for video {video_id}: {e}")
-        logger.error(f"Raw response: {response_content if 'response_content' in locals() else 'No response'}")
-        logger.error(f"Cleaned response: {cleaned_response if 'cleaned_response' in locals() else 'Not cleaned'}")
-        segments = extract_segments_fallback(response_content if 'response_content' in locals() else "")
-        logger.info(f"Fallback extracted {len(segments)} segments: {segments}")
-        non_important_segments = ImportantSegments(segments=segments)
-        skip_segments = create_enhanced_skip_segments(transcription_data, non_important_segments, user_preferences)
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=500, detail="Failed to parse LLM response")
     except Exception as e:
-        logger.error(f"Error processing video {video_id} with Groq: {e}")
-        
-        # Check if this is a Groq JSON validation error and try to extract failed generation
-        error_str = str(e)
-        if 'json_validate_failed' in error_str and 'failed_generation' in error_str:
-            logger.warning(f"Groq JSON validation failed for video {video_id}, attempting recovery")
-            
-            failed_generation = extract_failed_generation_from_error(error_str)
-            if failed_generation:
-                logger.info("Successfully extracted failed generation from error")
-                
-                # Try to clean and parse the failed generation
-                cleaned_response = clean_llm_response(failed_generation)
-                
-                try:
-                    response_json = json.loads(cleaned_response)
-                    segments = response_json.get('segments', [])
-                    logger.info(f"Successfully recovered from Groq JSON error, extracted {len(segments)} segments")
-                    non_important_segments = ImportantSegments(segments=segments)
-                    skip_segments = create_enhanced_skip_segments(transcription_data, non_important_segments, user_preferences)
-                except json.JSONDecodeError:
-                    # If still can't parse, use fallback
-                    logger.warning("Cleaned failed generation still invalid, using fallback extraction")
-                    segments = extract_segments_fallback(failed_generation)
-                    logger.info(f"Fallback extracted {len(segments)} segments from failed generation")
-                    non_important_segments = ImportantSegments(segments=segments)
-                    skip_segments = create_enhanced_skip_segments(transcription_data, non_important_segments, user_preferences)
-            else:
-                # If we can't extract failed generation, raise the original error
-                raise HTTPException(status_code=500, detail=f"Error processing with Groq: {str(e)}")
-        else:
-            # If it's not a JSON validation error, raise the original error
-            raise HTTPException(status_code=500, detail=f"Error processing with Groq: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error processing with Groq: {str(e)}")
     
     # Calculate skip percentage
     total_skip_time = sum(seg.end - seg.start for seg in skip_segments)

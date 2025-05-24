@@ -8,7 +8,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - OPENAI_API_KEY=sk-proj-00000000000000000000000000000000
+      - GROQ_API_KEY=${GROQ_API_KEY}
       - DEV_MODE=true # Set to "true" to enable auto-reload in development
     volumes:
       - .:/app # Mount the project directory for live updates
